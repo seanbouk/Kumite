@@ -18,10 +18,12 @@ export function setGamepadStatus(connected, name) {
   text.textContent = connected ? name || 'GAMEPAD READY' : 'NO GAMEPAD';
 }
 
-export function setMoveDisplay(gameName, moveName, inputDisplay) {
+export function setMoveDisplay(gameName, moveName, inputDisplay, character) {
   document.getElementById('quiz-game-name').textContent = gameName;
   document.getElementById('quiz-move-name').textContent = moveName;
   document.getElementById('quiz-move-input').textContent = inputDisplay || '';
+  const charEl = document.getElementById('quiz-character-name');
+  if (charEl) charEl.textContent = character || '';
 }
 
 export function clearMoveDisplay() {

@@ -7,6 +7,7 @@ export default {
     {
       id: 'hadouken',
       name: 'Hadouken',
+      character: 'Ryu',
       description: 'Quarter circle forward + Punch',
       inputDisplay: '↓ ↘ → + P',
       pattern: { type: 'sequence', directions: [2, 3, 6], button: 'anyPunch', maxTime: 800 },
@@ -15,6 +16,7 @@ export default {
     {
       id: 'shoryuken',
       name: 'Shoryuken',
+      character: 'Ryu',
       description: 'Dragon punch motion + Punch',
       inputDisplay: '→ ↓ ↘ + P',
       pattern: { type: 'sequence', directions: [6, 2, 3], button: 'anyPunch', maxTime: 800 },
@@ -23,6 +25,7 @@ export default {
     {
       id: 'tatsumaki',
       name: 'Tatsumaki Senpukyaku',
+      character: 'Ryu',
       description: 'Quarter circle back + Kick',
       inputDisplay: '↓ ↙ ← + K',
       pattern: { type: 'sequence', directions: [2, 1, 4], button: 'anyKick', maxTime: 800 },
@@ -31,6 +34,7 @@ export default {
     {
       id: 'sonic_boom',
       name: 'Sonic Boom',
+      character: 'Guile',
       description: 'Charge back, then forward + Punch',
       inputDisplay: '← (hold) → + P',
       pattern: { type: 'charge', chargeDirection: 4, releaseDirection: 6, button: 'anyPunch', chargeTime: 400, maxTime: 1500 },
@@ -39,6 +43,7 @@ export default {
     {
       id: 'flash_kick',
       name: 'Flash Kick',
+      character: 'Guile',
       description: 'Charge down, then up + Kick',
       inputDisplay: '↓ (hold) ↑ + K',
       pattern: { type: 'charge', chargeDirection: 2, releaseDirection: 8, button: 'anyKick', chargeTime: 400, maxTime: 1500 },
@@ -47,6 +52,7 @@ export default {
     {
       id: 'spinning_piledriver',
       name: 'Spinning Piledriver',
+      character: 'Zangief',
       description: 'Full 360 rotation + Punch',
       inputDisplay: '360° + P',
       pattern: { type: 'rotation', cardinals: [2, 4, 6, 8], button: 'anyPunch', maxTime: 800 },
@@ -55,6 +61,7 @@ export default {
     {
       id: 'yoga_flame',
       name: 'Yoga Flame',
+      character: 'Dhalsim',
       description: 'Half circle back + Punch',
       inputDisplay: '→ ↘ ↓ ↙ ← + P',
       pattern: { type: 'sequence', directions: [6, 3, 2, 1, 4], button: 'anyPunch', maxTime: 1000 },
@@ -63,6 +70,7 @@ export default {
     {
       id: 'tiger_uppercut',
       name: 'Tiger Uppercut',
+      character: 'Sagat',
       description: 'Dragon punch motion + Punch',
       inputDisplay: '→ ↓ ↘ + P',
       pattern: { type: 'sequence', directions: [6, 2, 3], button: 'anyPunch', maxTime: 800 },
@@ -71,6 +79,7 @@ export default {
     {
       id: 'hundred_hand_slap',
       name: 'Hundred Hand Slap',
+      character: 'E. Honda',
       description: 'Mash Punch rapidly',
       inputDisplay: 'P P P P P',
       pattern: { type: 'mash', button: 'anyPunch', count: 5, maxTime: 1000 },
@@ -79,6 +88,7 @@ export default {
     {
       id: 'spinning_bird_kick',
       name: 'Spinning Bird Kick',
+      character: 'Chun-Li',
       description: 'Charge down, then up + Kick',
       inputDisplay: '↓ (hold) ↑ + K',
       pattern: { type: 'charge', chargeDirection: 2, releaseDirection: 8, button: 'anyKick', chargeTime: 400, maxTime: 1500 },
@@ -87,6 +97,7 @@ export default {
     {
       id: 'sumo_headbutt',
       name: 'Sumo Headbutt',
+      character: 'E. Honda',
       description: 'Charge back, then forward + Punch',
       inputDisplay: '← (hold) → + P',
       pattern: { type: 'charge', chargeDirection: 4, releaseDirection: 6, button: 'anyPunch', chargeTime: 400, maxTime: 1500 },
@@ -95,6 +106,7 @@ export default {
     {
       id: 'yoga_teleport',
       name: 'Yoga Teleport',
+      character: 'Dhalsim',
       description: 'Dragon punch motion + All 3 Punches or Kicks',
       inputDisplay: '→ ↓ ↘ + PPP/KKK',
       pattern: { type: 'sequence', directions: [6, 2, 3], button: 'anyPunch', maxTime: 800 },

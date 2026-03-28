@@ -79,8 +79,8 @@ function nextRound() {
   currentMove = selectMove(active, scores);
   inputBuffer.clear();
 
-  // Show only the move name — no input notation (user should know it)
-  setMoveDisplay(gameData.name, currentMove.name, '');
+  // Show character name + move name — no input notation (user should know it)
+  setMoveDisplay(gameData.name, currentMove.name, '', currentMove.character);
   resetTimerBar();
 
   state = 'waiting';

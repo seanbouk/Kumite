@@ -7,6 +7,7 @@ export default {
     {
       id: 'power_wave',
       name: 'Power Wave',
+      character: 'Terry Bogard',
       description: 'Quarter circle forward + A',
       inputDisplay: '↓ ↘ → + A',
       pattern: { type: 'sequence', directions: [2, 3, 6], button: 'lp', maxTime: 800 },
@@ -15,6 +16,7 @@ export default {
     {
       id: 'burn_knuckle',
       name: 'Burn Knuckle',
+      character: 'Terry Bogard',
       description: 'Quarter circle back + A',
       inputDisplay: '↓ ↙ ← + A',
       pattern: { type: 'sequence', directions: [2, 1, 4], button: 'lp', maxTime: 800 },
@@ -23,6 +25,7 @@ export default {
     {
       id: 'rising_tackle',
       name: 'Rising Tackle',
+      character: 'Terry Bogard',
       description: 'Charge down, then up + A',
       inputDisplay: '↓ (hold) ↑ + A',
       pattern: { type: 'charge', chargeDirection: 2, releaseDirection: 8, button: 'lp', chargeTime: 400, maxTime: 1500 },
@@ -31,6 +34,7 @@ export default {
     {
       id: 'power_dunk',
       name: 'Power Dunk',
+      character: 'Terry Bogard',
       description: 'Dragon punch motion + B',
       inputDisplay: '→ ↓ ↘ + B',
       pattern: { type: 'sequence', directions: [6, 2, 3], button: 'mk', maxTime: 800 },
@@ -39,6 +43,7 @@ export default {
     {
       id: 'tiger_kick',
       name: 'Tiger Kick',
+      character: 'Joe Higashi',
       description: 'Dragon punch motion + C',
       inputDisplay: '→ ↓ ↘ + C',
       pattern: { type: 'sequence', directions: [6, 2, 3], button: 'hp', maxTime: 800 },
@@ -47,6 +52,7 @@ export default {
     {
       id: 'crack_shoot',
       name: 'Crack Shoot',
+      character: 'Terry Bogard',
       description: 'Quarter circle back + B',
       inputDisplay: '↓ ↙ ← + B',
       pattern: { type: 'sequence', directions: [2, 1, 4], button: 'mk', maxTime: 800 },
@@ -55,6 +61,7 @@ export default {
     {
       id: 'hurricane_upper',
       name: 'Hurricane Upper',
+      character: 'Joe Higashi',
       description: 'Half circle forward + A',
       inputDisplay: '← ↙ ↓ ↘ → + A',
       pattern: { type: 'sequence', directions: [4, 1, 2, 3, 6], button: 'lp', maxTime: 1000 },
@@ -63,6 +70,7 @@ export default {
     {
       id: 'slash_kick',
       name: 'Slash Kick',
+      character: 'Joe Higashi',
       description: 'Quarter circle forward + B',
       inputDisplay: '↓ ↘ → + B',
       pattern: { type: 'sequence', directions: [2, 3, 6], button: 'mk', maxTime: 800 },
@@ -71,6 +79,7 @@ export default {
     {
       id: 'geyser',
       name: 'Power Geyser',
+      character: 'Terry Bogard',
       description: 'Down-back, down-back, forward + C',
       inputDisplay: '↙ ↙ → + C',
       pattern: { type: 'sequence', directions: [1, 1, 6], button: 'hp', maxTime: 900 },
@@ -79,6 +88,7 @@ export default {
     {
       id: 'buster_wolf',
       name: 'Buster Wolf',
+      character: 'Terry Bogard',
       description: 'Double quarter circle forward + C',
       inputDisplay: '↓ ↘ → ↓ ↘ → + C',
       pattern: { type: 'sequence', directions: [2, 3, 6, 2, 3, 6], button: 'hp', maxTime: 900 },

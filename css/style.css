@@ -270,6 +270,13 @@ body {
   letter-spacing: 3px;
 }
 
+#quiz-character-name {
+  font-size: 12px;
+  color: var(--cyan);
+  letter-spacing: 2px;
+  min-height: 18px;
+}
+
 #quiz-move-name {
   font-size: 20px;
   color: var(--amber);

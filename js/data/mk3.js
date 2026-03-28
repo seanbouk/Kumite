@@ -7,6 +7,7 @@ export default {
     {
       id: 'freeze',
       name: 'Ice Blast',
+      character: 'Sub-Zero',
       description: 'Down, Forward + Low Punch',
       inputDisplay: '↓ → LP',
       pattern: { type: 'sequence', directions: [2, 6], button: 'lp', buttonTiming: 'after', maxTime: 800 },
@@ -15,6 +16,7 @@ export default {
     {
       id: 'slide',
       name: 'Slide',
+      character: 'Sub-Zero',
       description: 'Back + Low Punch + Low Kick + Block',
       inputDisplay: '← + LP + LK + BL',
       pattern: { type: 'sequence', directions: [4], button: 'lp', maxTime: 400 },
@@ -23,6 +25,7 @@ export default {
     {
       id: 'spear',
       name: 'Spear',
+      character: 'Scorpion',
       description: 'Back, Back + Low Punch',
       inputDisplay: '← ← LP',
       pattern: { type: 'sequence', directions: [4, 4], button: 'lp', buttonTiming: 'after', maxTime: 800 },
@@ -31,6 +34,7 @@ export default {
     {
       id: 'teleport_punch',
       name: 'Teleport Punch',
+      character: 'Scorpion',
       description: 'Down, Back + High Punch',
       inputDisplay: '↓ ← HP',
       pattern: { type: 'sequence', directions: [2, 4], button: 'hp', buttonTiming: 'after', maxTime: 800 },
@@ -39,6 +43,7 @@ export default {
     {
       id: 'bicycle_kick',
       name: 'Bicycle Kick',
+      character: 'Liu Kang',
       description: 'Back, Back, Forward + High Kick',
       inputDisplay: '← ← → HK',
       pattern: { type: 'sequence', directions: [4, 4, 6], button: 'hk', buttonTiming: 'after', maxTime: 900 },
@@ -47,6 +52,7 @@ export default {
     {
       id: 'fan_throw',
       name: 'Fan Throw',
+      character: 'Kitana',
       description: 'Back, Back + High Punch',
       inputDisplay: '← ← HP',
       pattern: { type: 'sequence', directions: [4, 4], button: 'hp', buttonTiming: 'after', maxTime: 800 },
@@ -55,6 +61,7 @@ export default {
     {
       id: 'shadow_kick',
       name: 'Shadow Kick',
+      character: 'Johnny Cage',
       description: 'Back, Forward + High Kick',
       inputDisplay: '← → HK',
       pattern: { type: 'sequence', directions: [4, 6], button: 'hk', buttonTiming: 'after', maxTime: 800 },
@@ -63,6 +70,7 @@ export default {
     {
       id: 'forceball',
       name: 'Force Ball',
+      character: 'Reptile',
       description: 'Down, Back + Low Kick',
       inputDisplay: '↓ ← LK',
       pattern: { type: 'sequence', directions: [2, 4], button: 'lk', buttonTiming: 'after', maxTime: 800 },
@@ -71,6 +79,7 @@ export default {
     {
       id: 'flying_punch',
       name: 'Flying Punch',
+      character: 'Jax',
       description: 'Forward, Forward + High Punch',
       inputDisplay: '→ → HP',
       pattern: { type: 'sequence', directions: [6, 6], button: 'hp', buttonTiming: 'after', maxTime: 800 },
@@ -79,6 +88,7 @@ export default {
     {
       id: 'acid_spit',
       name: 'Acid Spit',
+      character: 'Reptile',
       description: 'Forward, Forward + High Punch',
       inputDisplay: '→ → HP',
       pattern: { type: 'sequence', directions: [6, 6], button: 'hp', buttonTiming: 'after', maxTime: 800 },

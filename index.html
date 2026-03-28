@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KUMITE — Fighting Game Move Trainer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="scanlines"></div>
+
+  <div id="gamepad-status">
+    <span id="gamepad-icon">🎮</span>
+    <span id="gamepad-text">NO GAMEPAD</span>
+  </div>
+
+  <!-- TITLE SCREEN -->
+  <div id="screen-title" class="screen active">
+    <div class="title-content">
+      <h1 class="title-logo">KUMITE</h1>
+      <p class="title-sub">FIGHTING MOVE TRAINER</p>
+      <p class="title-prompt blink">CONNECT GAMEPAD TO START</p>
+    </div>
+  </div>
+
+  <!-- GAME SELECT SCREEN -->
+  <div id="screen-select" class="screen">
+    <h2 class="screen-heading">SELECT YOUR GAME</h2>
+    <div id="game-grid" class="game-grid">
+      <!-- populated by JS -->
+    </div>
+    <p class="select-hint">PRESS A OR START TO SELECT</p>
+  </div>
+
+  <!-- QUIZ SCREEN -->
+  <div id="screen-quiz" class="screen">
+    <div id="progress-bar-container">
+      <div id="progress-bar-label">MASTERY</div>
+      <div id="progress-bar-track">
+        <div id="progress-bar-fill"></div>
+      </div>
+      <div id="progress-bar-value">0%</div>
+    </div>
+
+    <div id="quiz-area">
+      <div id="quiz-game-name"></div>
+      <div id="quiz-move-name"></div>
+      <div id="quiz-move-input"></div>
+      <div id="quiz-timer-bar">
+        <div id="quiz-timer-fill"></div>
+      </div>
+      <div id="quiz-input-display">
+        <span id="quiz-dir-display">5</span>
+        <span id="quiz-btn-display"></span>
+      </div>
+    </div>
+
+    <div id="quiz-result" class="hidden">
+      <span id="quiz-result-text"></span>
+    </div>
+
+    <div id="quiz-footer">
+      <button id="btn-back" class="retro-btn">BACK</button>
+      <div id="quiz-stats">
+        <span id="stat-active">MOVES: 3</span>
+        <span id="stat-streak">STREAK: 0</span>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

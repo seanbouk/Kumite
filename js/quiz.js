@@ -76,7 +76,8 @@ function getActiveMoves() {
 
 function nextRound() {
   const active = getActiveMoves();
-  currentMove = selectMove(active, scores);
+  const lastId = currentMove ? currentMove.id : null;
+  currentMove = selectMove(active, scores, lastId);
   inputBuffer.clear();
 
   // Show character name + move name — no input notation (user should know it)

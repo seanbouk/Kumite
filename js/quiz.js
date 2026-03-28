@@ -7,7 +7,7 @@ import {
   updateProgressBar, updateStats,
 } from './ui.js';
 
-const COUNTDOWN_SECONDS = 4;
+const COUNTDOWN_SECONDS = 8;
 const INITIAL_ACTIVE = 3;
 
 let gameData = null;

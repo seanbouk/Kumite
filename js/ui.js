@@ -21,7 +21,7 @@ export function setGamepadStatus(connected, name) {
 export function setMoveDisplay(gameName, moveName, inputDisplay) {
   document.getElementById('quiz-game-name').textContent = gameName;
   document.getElementById('quiz-move-name').textContent = moveName;
-  document.getElementById('quiz-move-input').textContent = inputDisplay;
+  document.getElementById('quiz-move-input').textContent = inputDisplay || '';
 }
 
 export function clearMoveDisplay() {
@@ -52,19 +52,38 @@ export function resetTimerBar() {
   fill.classList.remove('warning', 'danger');
 }
 
-export function flashResult(type) {
+// For correct: brief flash with input shown
+// For wrong: show input and wait for any button press to continue
+let _wrongDismissResolve = null;
+
+export function flashResult(type, inputDisplay) {
   const container = document.getElementById('quiz-result');
   const text = document.getElementById('quiz-result-text');
-  text.className = type; // 'correct' or 'wrong'
-  text.textContent = type === 'correct' ? 'PERFECT!' : "TIME'S UP";
+  text.className = type;
   container.classList.remove('hidden');
 
-  return new Promise(resolve => {
-    setTimeout(() => {
-      container.classList.add('hidden');
-      resolve();
-    }, 1200);
-  });
+  if (type === 'correct') {
+    text.innerHTML = `PERFECT!<div class="result-input">${inputDisplay || ''}</div>`;
+    return new Promise(resolve => {
+      setTimeout(() => {
+        container.classList.add('hidden');
+        resolve();
+      }, 800);
+    });
+  } else {
+    text.innerHTML = `TIME'S UP<div class="result-input">${inputDisplay || ''}</div><div class="result-hint">PRESS ANY BUTTON</div>`;
+    return new Promise(resolve => {
+      _wrongDismissResolve = () => {
+        _wrongDismissResolve = null;
+        container.classList.add('hidden');
+        resolve();
+      };
+    });
+  }
+}
+
+export function dismissWrongResult() {
+  if (_wrongDismissResolve) _wrongDismissResolve();
 }
 
 export function updateProgressBar(fraction) {

@@ -341,6 +341,23 @@ body {
   font-family: var(--font);
   letter-spacing: 6px;
   animation: resultPop 0.4s ease-out;
+  text-align: center;
+}
+
+.result-input {
+  font-size: 14px;
+  margin-top: 16px;
+  letter-spacing: 3px;
+  color: var(--white);
+  text-shadow: none;
+}
+
+.result-hint {
+  font-size: 8px;
+  margin-top: 20px;
+  color: var(--dim);
+  letter-spacing: 2px;
+  animation: blink 1s step-end infinite;
 }
 
 #quiz-result-text.correct {

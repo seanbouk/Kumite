@@ -3,12 +3,11 @@ import { selectMove, recordCorrect, recordWrong, shouldExpand, computeProgress }
 import { save, load } from './progress.js';
 import {
   setMoveDisplay, clearMoveDisplay, updateInputDisplay,
-  setTimerBar, resetTimerBar, flashResult,
+  setTimerBar, resetTimerBar, flashResult, dismissWrongResult,
   updateProgressBar, updateStats,
 } from './ui.js';
 
 const COUNTDOWN_SECONDS = 4;
-const SHOW_DURATION = 1500;
 const INITIAL_ACTIVE = 3;
 
 let gameData = null;
@@ -16,10 +15,9 @@ let scores = {};
 let activeCount = INITIAL_ACTIVE;
 let streak = 0;
 let currentMove = null;
-let state = 'idle'; // idle | showing | waiting | judging | result
+let state = 'idle'; // idle | waiting | judging | result-correct | result-wrong
 let inputBuffer = new InputBuffer();
 let timerStart = 0;
-let showStart = 0;
 let rafId = null;
 let inputHandler = null;
 
@@ -51,6 +49,8 @@ export function start(game, gamepadModule) {
 
     if (state === 'waiting' && currentMove) {
       checkInput();
+    } else if (state === 'result-wrong' && snapshot.newlyPressed.length > 0) {
+      dismissWrongResult();
     }
   };
   gamepadModule.onInput(inputHandler);
@@ -79,32 +79,13 @@ function nextRound() {
   currentMove = selectMove(active, scores);
   inputBuffer.clear();
 
-  // Show phase: display the move for a moment
-  state = 'showing';
-  setMoveDisplay(gameData.name, currentMove.name, currentMove.inputDisplay);
+  // Show only the move name — no input notation (user should know it)
+  setMoveDisplay(gameData.name, currentMove.name, '');
   resetTimerBar();
-  showStart = performance.now();
 
-  if (rafId) cancelAnimationFrame(rafId);
-  rafId = requestAnimationFrame(showLoop);
-}
-
-function showLoop(now) {
-  if (state !== 'showing') return;
-
-  const elapsed = now - showStart;
-  if (elapsed >= SHOW_DURATION) {
-    startWaiting();
-    return;
-  }
-
-  rafId = requestAnimationFrame(showLoop);
-}
-
-function startWaiting() {
   state = 'waiting';
   timerStart = performance.now();
-  inputBuffer.clear(); // clear any inputs from the show phase
+  if (rafId) cancelAnimationFrame(rafId);
   rafId = requestAnimationFrame(waitLoop);
 }
 
@@ -173,7 +154,8 @@ async function onCorrect() {
   saveProgress();
   updateUI();
 
-  await flashResult('correct');
+  state = 'result-correct';
+  await flashResult('correct', currentMove.inputDisplay);
 
   state = 'idle';
   nextRound();
@@ -189,7 +171,8 @@ async function onWrong() {
   saveProgress();
   updateUI();
 
-  await flashResult('wrong');
+  state = 'result-wrong';
+  await flashResult('wrong', currentMove.inputDisplay);
 
   state = 'idle';
   nextRound();

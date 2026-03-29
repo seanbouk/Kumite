@@ -116,6 +116,8 @@ function makeSnapshot(gp) {
   return {
     direction: readDirection(gp),
     buttons: readButtons(gp),
+    rawLB: !!gp.buttons[4]?.pressed,
+    rawRB: !!gp.buttons[5]?.pressed,
     timestamp: performance.now(),
   };
 }
@@ -150,11 +152,17 @@ function pollLoop() {
       snap.buttons
     );
 
+    // Raw bumper edge detection (layout-independent, for menu nav)
+    const newlyLB = snap.rawLB && !(prevSnapshot?.rawLB);
+    const newlyRB = snap.rawRB && !(prevSnapshot?.rawRB);
+
     for (const fn of listeners) {
       fn({
         direction: snap.direction,
         buttons: snap.buttons,
         newlyPressed,
+        newlyLB,
+        newlyRB,
         timestamp: snap.timestamp,
       });
     }

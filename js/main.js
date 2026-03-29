@@ -48,9 +48,42 @@ function onTitleInput(snapshot) {
 }
 
 // --- SELECT SCREEN ---
+function getGridCols() {
+  const cards = document.querySelectorAll('.game-card');
+  if (cards.length < 2) return 1;
+  // Count how many cards share the same top offset = one row
+  const firstTop = cards[0].offsetTop;
+  let cols = 0;
+  for (const card of cards) {
+    if (card.offsetTop === firstTop) cols++;
+    else break;
+  }
+  return cols || 1;
+}
+
 function onSelectInput(snapshot) {
   if (currentScreen !== 'screen-select') return;
-  if (snapshot.newlyPressed.some(b => !['block', 'shield'].includes(b))) {
+
+  // LB/RB for category switching (raw bumper detection, layout-independent)
+  if (snapshot.newlyLB) {
+    const cats = CATEGORIES;
+    const idx = cats.findIndex(c => c.id === selectedCategory);
+    const newIdx = (idx - 1 + cats.length) % cats.length;
+    onCategorySelect(cats[newIdx].id);
+    buildCategoryTabs(CATEGORIES, selectedCategory, onCategorySelect);
+    return;
+  }
+  if (snapshot.newlyRB) {
+    const cats = CATEGORIES;
+    const idx = cats.findIndex(c => c.id === selectedCategory);
+    const newIdx = (idx + 1) % cats.length;
+    onCategorySelect(cats[newIdx].id);
+    buildCategoryTabs(CATEGORIES, selectedCategory, onCategorySelect);
+    return;
+  }
+
+  // Any face button to select (but not bumpers — those are category nav)
+  if (!snapshot.newlyLB && !snapshot.newlyRB && snapshot.newlyPressed.length > 0) {
     startGame(filteredGames[selectedGameIndex]);
   }
 }
@@ -65,25 +98,21 @@ function onMenuNav(snapshot) {
   const dir = snapshot.direction;
   if (dir !== prevMenuDir) {
     if (dir === 6 && prevMenuDir !== 6) {
+      // Right
       selectedGameIndex = (selectedGameIndex + 1) % filteredGames.length;
       setSelectedCard(selectedGameIndex);
     } else if (dir === 4 && prevMenuDir !== 4) {
+      // Left
       selectedGameIndex = (selectedGameIndex - 1 + filteredGames.length) % filteredGames.length;
       setSelectedCard(selectedGameIndex);
-    } else if (dir === 8 && prevMenuDir !== 8) {
-      // Up: previous category
-      const cats = CATEGORIES;
-      const idx = cats.findIndex(c => c.id === selectedCategory);
-      const newIdx = (idx - 1 + cats.length) % cats.length;
-      onCategorySelect(cats[newIdx].id);
-      buildCategoryTabs(CATEGORIES, selectedCategory, onCategorySelect);
     } else if (dir === 2 && prevMenuDir !== 2) {
-      // Down: next category
-      const cats = CATEGORIES;
-      const idx = cats.findIndex(c => c.id === selectedCategory);
-      const newIdx = (idx + 1) % cats.length;
-      onCategorySelect(cats[newIdx].id);
-      buildCategoryTabs(CATEGORIES, selectedCategory, onCategorySelect);
+      // Down — move one row
+      selectedGameIndex = (selectedGameIndex + getGridCols()) % filteredGames.length;
+      setSelectedCard(selectedGameIndex);
+    } else if (dir === 8 && prevMenuDir !== 8) {
+      // Up — move one row
+      selectedGameIndex = (selectedGameIndex - getGridCols() + filteredGames.length) % filteredGames.length;
+      setSelectedCard(selectedGameIndex);
     }
     prevMenuDir = dir;
   }

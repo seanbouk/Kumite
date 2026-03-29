@@ -1,13 +1,14 @@
 const MAX_REROLLS = 10;
 
 export function selectMove(activeMoves, scores, lastMoveId) {
+  // Filter out the last move entirely so it can never be picked
+  const pool = activeMoves.length > 1
+    ? activeMoves.filter(m => m.id !== lastMoveId)
+    : activeMoves;
+
   for (let attempt = 0; attempt < MAX_REROLLS; attempt++) {
-    const idx = Math.floor(Math.random() * activeMoves.length);
-    const move = activeMoves[idx];
-
-    // Never pick the same move twice in a row (if there's more than one option)
-    if (move.id === lastMoveId && activeMoves.length > 1) continue;
-
+    const idx = Math.floor(Math.random() * pool.length);
+    const move = pool[idx];
     const score = scores[move.id] ?? 0.5;
 
     // score = probability we keep this pick
@@ -17,11 +18,8 @@ export function selectMove(activeMoves, scores, lastMoveId) {
     }
   }
 
-  // Fallback: pick the highest-score (hardest) move, excluding last move if possible
-  const candidates = activeMoves.length > 1
-    ? activeMoves.filter(m => m.id !== lastMoveId)
-    : activeMoves;
-  return candidates.reduce((worst, m) =>
+  // Fallback: pick the highest-score (hardest) move from the filtered pool
+  return pool.reduce((worst, m) =>
     (scores[m.id] ?? 0.5) > (scores[worst.id] ?? 0.5) ? m : worst
   );
 }

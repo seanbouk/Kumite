@@ -56,26 +56,42 @@ export function resetTimerBar() {
 
 let _wrongDismissResolve = null;
 
+function clearResult() {
+  const resultEl = document.getElementById('quiz-result-text');
+  const hintEl = document.getElementById('quiz-result-hint');
+  resultEl.textContent = '';
+  resultEl.className = '';
+  hintEl.textContent = '';
+  hintEl.className = '';
+}
+
 export function flashResult(type, inputDisplay) {
-  const container = document.getElementById('quiz-result');
-  const text = document.getElementById('quiz-result-text');
-  text.className = type;
-  container.classList.remove('hidden');
+  const resultEl = document.getElementById('quiz-result-text');
+  const hintEl = document.getElementById('quiz-result-hint');
+  const moveInput = document.getElementById('quiz-move-input');
 
   if (type === 'correct') {
-    text.innerHTML = `PERFECT!<div class="result-input">${inputDisplay || ''}</div>`;
+    resultEl.textContent = 'PERFECT!';
+    resultEl.className = 'correct';
+    moveInput.textContent = inputDisplay || '';
+    hintEl.textContent = '';
+    hintEl.className = '';
     return new Promise(resolve => {
       setTimeout(() => {
-        container.classList.add('hidden');
+        clearResult();
         resolve();
       }, 800);
     });
   } else {
-    text.innerHTML = `TIME'S UP<div class="result-input">${inputDisplay || ''}</div><div class="result-hint">PRESS ANY BUTTON</div>`;
+    resultEl.textContent = "TIME'S UP";
+    resultEl.className = 'wrong';
+    moveInput.textContent = inputDisplay || '';
+    hintEl.textContent = 'PRESS ANY BUTTON';
+    hintEl.className = 'blink';
     return new Promise(resolve => {
       _wrongDismissResolve = () => {
         _wrongDismissResolve = null;
-        container.classList.add('hidden');
+        clearResult();
         resolve();
       };
     });

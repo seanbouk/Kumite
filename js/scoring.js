@@ -40,11 +40,14 @@ export function shouldExpand(scores) {
   return Object.values(scores).some(s => s < 0.1);
 }
 
-export function computeProgress(scores, totalMoves) {
-  if (totalMoves === 0) return 0;
+export function computeProgress(scores, allMoveIds) {
+  if (allMoveIds.length === 0) return 0;
   let sum = 0;
-  for (const s of Object.values(scores)) {
-    sum += (1 - s);
+  for (const id of allMoveIds) {
+    // Default score is 0.5 (untested). 0.0 = fully mastered. ≥0.5 = no progress.
+    // Map: 0.0 → 1.0 mastery, 0.5+ → 0.0 mastery
+    const s = scores[id] ?? 0.5;
+    sum += Math.max(0, 1 - 2 * s);
   }
-  return sum / totalMoves;
+  return sum / allMoveIds.length;
 }

@@ -189,7 +189,8 @@ function saveProgress() {
 }
 
 function updateUI() {
-  const progress = computeProgress(scores, gameData.moves.length);
+  const allIds = gameData.moves.map(m => m.id);
+  const progress = computeProgress(scores, allIds);
   updateProgressBar(progress);
   updateStats(activeCount, streak);
 }

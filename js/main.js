@@ -1,16 +1,36 @@
 import * as gamepad from './gamepad.js';
 import * as quiz from './quiz.js';
-import { showScreen, setGamepadStatus, setTitlePrompt, buildGameGrid, setSelectedCard } from './ui.js';
-
-import sf2 from './data/sf2.js';
-import mk3 from './data/mk3.js';
-import ffs from './data/fatal-fury.js';
-
-const GAMES = [sf2, mk3, ffs];
+import { showScreen, setGamepadStatus, setTitlePrompt, buildGameGrid, setSelectedCard, buildCategoryTabs } from './ui.js';
+import { GAME_REGISTRY, CATEGORIES, loadGameData } from './data/registry.js';
 
 let currentScreen = 'screen-title';
 let selectedGameIndex = 0;
+let selectedCategory = 'all';
+let filteredGames = [...GAME_REGISTRY];
 let gamepadConnected = false;
+
+function getFilteredGames() {
+  if (selectedCategory === 'all') return [...GAME_REGISTRY];
+  return GAME_REGISTRY.filter(g => g.category === selectedCategory);
+}
+
+function refreshGameGrid() {
+  filteredGames = getFilteredGames();
+  selectedGameIndex = 0;
+  buildGameGrid(filteredGames, onGameClick);
+  if (filteredGames.length > 0) setSelectedCard(0);
+}
+
+function onGameClick(game) {
+  const idx = filteredGames.indexOf(game);
+  if (idx >= 0) selectedGameIndex = idx;
+  startGame(game);
+}
+
+function onCategorySelect(catId) {
+  selectedCategory = catId;
+  refreshGameGrid();
+}
 
 // --- SCREEN ROUTING ---
 function goTo(screenId) {
@@ -21,7 +41,6 @@ function goTo(screenId) {
 // --- TITLE SCREEN ---
 function onTitleInput(snapshot) {
   if (!gamepadConnected) return;
-  // Any button press goes to select screen
   if (snapshot.newlyPressed.length > 0) {
     goTo('screen-select');
     setSelectedCard(selectedGameIndex);
@@ -31,19 +50,11 @@ function onTitleInput(snapshot) {
 // --- SELECT SCREEN ---
 function onSelectInput(snapshot) {
   if (currentScreen !== 'screen-select') return;
-
-  // Navigate with d-pad left/right
-  if (snapshot.newlyPressed.length === 0 && snapshot.direction !== 5) {
-    // Only trigger on direction change (handled by buffer, but we track here too)
-  }
-
-  // Accept with any face button
-  if (snapshot.newlyPressed.some(b => ['lp', 'mp', 'hp', 'lk', 'mk', 'hk'].includes(b))) {
-    startGame(GAMES[selectedGameIndex]);
+  if (snapshot.newlyPressed.some(b => !['block', 'shield'].includes(b))) {
+    startGame(filteredGames[selectedGameIndex]);
   }
 }
 
-// Track direction changes for menu navigation
 let prevMenuDir = 5;
 function onMenuNav(snapshot) {
   if (currentScreen !== 'screen-select') {
@@ -54,21 +65,37 @@ function onMenuNav(snapshot) {
   const dir = snapshot.direction;
   if (dir !== prevMenuDir) {
     if (dir === 6 && prevMenuDir !== 6) {
-      // Right
-      selectedGameIndex = (selectedGameIndex + 1) % GAMES.length;
+      selectedGameIndex = (selectedGameIndex + 1) % filteredGames.length;
       setSelectedCard(selectedGameIndex);
     } else if (dir === 4 && prevMenuDir !== 4) {
-      // Left
-      selectedGameIndex = (selectedGameIndex - 1 + GAMES.length) % GAMES.length;
+      selectedGameIndex = (selectedGameIndex - 1 + filteredGames.length) % filteredGames.length;
       setSelectedCard(selectedGameIndex);
+    } else if (dir === 8 && prevMenuDir !== 8) {
+      // Up: previous category
+      const cats = CATEGORIES;
+      const idx = cats.findIndex(c => c.id === selectedCategory);
+      const newIdx = (idx - 1 + cats.length) % cats.length;
+      onCategorySelect(cats[newIdx].id);
+      buildCategoryTabs(CATEGORIES, selectedCategory, onCategorySelect);
+    } else if (dir === 2 && prevMenuDir !== 2) {
+      // Down: next category
+      const cats = CATEGORIES;
+      const idx = cats.findIndex(c => c.id === selectedCategory);
+      const newIdx = (idx + 1) % cats.length;
+      onCategorySelect(cats[newIdx].id);
+      buildCategoryTabs(CATEGORIES, selectedCategory, onCategorySelect);
     }
     prevMenuDir = dir;
   }
 }
 
-function startGame(game) {
+async function startGame(registryEntry) {
+  if (!registryEntry) return;
   goTo('screen-quiz');
-  quiz.start(game, gamepad);
+  const gameData = await loadGameData(registryEntry.id);
+  if (gameData) {
+    quiz.start(gameData, gamepad);
+  }
 }
 
 // --- BACK BUTTON ---
@@ -99,22 +126,15 @@ gamepad.onInput((snapshot) => {
     onSelectInput(snapshot);
     onMenuNav(snapshot);
   }
-  // Quiz screen handles its own input via quiz.js
 });
 
 // --- INIT ---
 function init() {
-  buildGameGrid(GAMES, (game) => {
-    const idx = GAMES.indexOf(game);
-    if (idx >= 0) selectedGameIndex = idx;
-    startGame(game);
-  });
-
-  setSelectedCard(0);
+  buildCategoryTabs(CATEGORIES, selectedCategory, onCategorySelect);
+  refreshGameGrid();
   gamepad.init();
   goTo('screen-title');
 
-  // Check if gamepad already connected
   const pads = navigator.getGamepads();
   for (const pad of pads) {
     if (pad) {

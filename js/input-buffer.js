@@ -62,6 +62,10 @@ class InputBuffer {
       case 'charge': return this._matchCharge(pattern);
       case 'rotation': return this._matchRotation(pattern);
       case 'mash': return this._matchMash(pattern);
+      case 'press': return this._matchPress(pattern);
+      case 'buttonString': return this._matchButtonString(pattern);
+      case 'dashButton': return this._matchDashButton(pattern);
+      case 'stanceButton': return this._matchStanceButton(pattern);
       default: return false;
     }
   }
@@ -237,6 +241,158 @@ class InputBuffer {
     return hits >= (count || 5);
   }
 
+  // ---- PRESS MATCHING ----
+  // Direction + button(s) simultaneously (Tekken d/f+2, Smash side-B)
+  _matchPress(pattern) {
+    const { direction, buttons, maxTime } = pattern;
+    const buf = this.buffer;
+    if (buf.length === 0) return false;
+    const now = buf[buf.length - 1].time;
+
+    for (let i = buf.length - 1; i >= 0; i--) {
+      if (now - buf[i].time > (maxTime || 300)) break;
+      if (buf[i].buttons.length === 0) continue;
+
+      // Check all required buttons are pressed
+      if (!this._buttonsAllMatch(buf[i].buttons, buttons)) continue;
+
+      // Check direction (if specified, 5 = neutral / any)
+      if (direction && direction !== 5) {
+        // Check this entry or adjacent entries within 100ms for the direction
+        let dirOk = false;
+        for (let j = Math.max(0, i - 2); j <= Math.min(buf.length - 1, i + 1); j++) {
+          if (Math.abs(buf[j].time - buf[i].time) <= 100) {
+            if (this._dirFuzzyMatch(buf[j].direction, direction)) {
+              dirOk = true;
+              break;
+            }
+          }
+        }
+        if (!dirOk) continue;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  // ---- BUTTON STRING MATCHING ----
+  // Timed sequence of button presses (Tekken 1,2,3 or d/f+1,2,1)
+  _matchButtonString(pattern) {
+    const { steps, stepTime, maxTime } = pattern;
+    const buf = this.buffer;
+    if (buf.length === 0 || steps.length === 0) return false;
+    const now = buf[buf.length - 1].time;
+
+    // Find the last step first, then work backward
+    let stepIdx = steps.length - 1;
+    let prevMatchTime = null;
+
+    for (let i = buf.length - 1; i >= 0 && stepIdx >= 0; i--) {
+      if (now - buf[i].time > (maxTime || 1500)) break;
+      if (buf[i].buttons.length === 0) continue;
+
+      const step = steps[stepIdx];
+      const btnMatch = this._buttonsAllMatch(buf[i].buttons, step.buttons);
+      if (!btnMatch) continue;
+
+      // Check direction if step requires it
+      if (step.direction && step.direction !== 5) {
+        if (!this._dirFuzzyMatch(buf[i].direction, step.direction)) continue;
+      }
+
+      // Check timing between consecutive steps
+      if (prevMatchTime !== null && (prevMatchTime - buf[i].time) > (stepTime || 400)) continue;
+
+      prevMatchTime = buf[i].time;
+      stepIdx--;
+    }
+
+    return stepIdx < 0;
+  }
+
+  // ---- DASH BUTTON MATCHING ----
+  // Double-tap direction + button (Tekken f,f+2)
+  _matchDashButton(pattern) {
+    const { direction, buttons, dashTime, maxTime } = pattern;
+    const buf = this.buffer;
+    if (buf.length === 0) return false;
+    const now = buf[buf.length - 1].time;
+
+    // Find the button press
+    let buttonIdx = -1;
+    for (let i = buf.length - 1; i >= 0; i--) {
+      if (now - buf[i].time > (maxTime || 600)) break;
+      if (buf[i].buttons.length > 0 && this._buttonsAllMatch(buf[i].buttons, buttons)) {
+        buttonIdx = i;
+        break;
+      }
+    }
+    if (buttonIdx === -1) return false;
+
+    const buttonTime = buf[buttonIdx].time;
+
+    // Find two taps of the direction before the button, with non-matching between them
+    let taps = 0;
+    let lastTapTime = buttonTime;
+    for (let i = buttonIdx; i >= 0; i--) {
+      if (buttonTime - buf[i].time > (maxTime || 600)) break;
+      if (this._dirFuzzyMatch(buf[i].direction, direction)) {
+        if (taps === 0 || (lastTapTime - buf[i].time) <= (dashTime || 300)) {
+          taps++;
+          lastTapTime = buf[i].time;
+          if (taps >= 2) return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  // ---- STANCE BUTTON MATCHING ----
+  // WS (while standing) / FC (full crouch) moves
+  _matchStanceButton(pattern) {
+    const { stance, buttons, maxTime } = pattern;
+    const buf = this.buffer;
+    if (buf.length === 0) return false;
+    const now = buf[buf.length - 1].time;
+
+    // Find button press
+    let buttonIdx = -1;
+    for (let i = buf.length - 1; i >= 0; i--) {
+      if (now - buf[i].time > (maxTime || 800)) break;
+      if (buf[i].buttons.length > 0 && this._buttonsAllMatch(buf[i].buttons, buttons)) {
+        buttonIdx = i;
+        break;
+      }
+    }
+    if (buttonIdx === -1) return false;
+
+    const buttonTime = buf[buttonIdx].time;
+    const isDown = (d) => d === 1 || d === 2 || d === 3;
+
+    if (stance === 'ws') {
+      // While standing: was crouching, then stood up, then button
+      let foundCrouch = false;
+      let foundRise = false;
+      for (let i = buttonIdx - 1; i >= 0; i--) {
+        if (buttonTime - buf[i].time > (maxTime || 800)) break;
+        if (!foundRise && !isDown(buf[i].direction)) {
+          foundRise = true;
+        } else if (foundRise && isDown(buf[i].direction)) {
+          foundCrouch = true;
+          break;
+        }
+      }
+      return foundCrouch && foundRise;
+    }
+
+    if (stance === 'fc') {
+      // Full crouch: direction is down at time of button press
+      return isDown(buf[buttonIdx].direction);
+    }
+
+    return false;
+  }
+
   // ---- DIRECTION HELPERS ----
   // Fuzzy match: does `actual` satisfy `wanted`?
   // Accepts adjacent directions (e.g., ↓ counts as ↘ and vice versa)
@@ -247,6 +403,17 @@ class InputBuffer {
   }
 
   // ---- BUTTON HELPERS ----
+  // Check if ALL required buttons are present in pressed
+  _buttonsAllMatch(pressedButtons, requiredArray) {
+    if (!requiredArray || requiredArray.length === 0) return pressedButtons.length > 0;
+    return requiredArray.every(req => {
+      if (req === 'anyPunch') return pressedButtons.some(b => b === 'lp' || b === 'mp' || b === 'hp');
+      if (req === 'anyKick') return pressedButtons.some(b => b === 'lk' || b === 'mk' || b === 'hk');
+      return pressedButtons.includes(req);
+    });
+  }
+
+  // Check if ANY pressed button matches required (for single-button patterns)
   _buttonMatches(pressedButtons, required) {
     if (pressedButtons.length === 0) return false;
     if (required === 'anyPunch') {

@@ -26,6 +26,11 @@ export function start(game, gamepadModule) {
   inputBuffer = new InputBuffer();
   streak = 0;
 
+  // Set the button layout for this game
+  if (gamepadModule.setButtonLayout && game.buttonLayout) {
+    gamepadModule.setButtonLayout(game.buttonLayout);
+  }
+
   // Load saved progress
   const saved = load(game.id);
   if (saved) {

@@ -54,8 +54,6 @@ export function resetTimerBar() {
   fill.classList.remove('warning', 'danger');
 }
 
-// For correct: brief flash with input shown
-// For wrong: show input and wait for any button press to continue
 let _wrongDismissResolve = null;
 
 export function flashResult(type, inputDisplay) {
@@ -105,6 +103,19 @@ export function setTitlePrompt(text) {
   if (el) el.textContent = text;
 }
 
+export function buildCategoryTabs(categories, activeId, onSelect) {
+  const container = document.getElementById('category-tabs');
+  if (!container) return;
+  container.innerHTML = '';
+  categories.forEach(cat => {
+    const tab = document.createElement('button');
+    tab.className = 'category-tab' + (cat.id === activeId ? ' active' : '');
+    tab.textContent = cat.label;
+    tab.addEventListener('click', () => onSelect(cat.id));
+    container.appendChild(tab);
+  });
+}
+
 export function buildGameGrid(games, onSelect) {
   const grid = document.getElementById('game-grid');
   grid.innerHTML = '';
@@ -112,10 +123,10 @@ export function buildGameGrid(games, onSelect) {
     const card = document.createElement('div');
     card.className = 'game-card';
     card.dataset.index = index;
+    // Registry entries don't have .moves — show subtitle only
     card.innerHTML = `
       <div class="game-card-title">${game.name}</div>
-      <div class="game-card-sub">${game.subtitle}</div>
-      <div class="game-card-moves">${game.moves.length} MOVES</div>
+      <div class="game-card-sub">${game.subtitle || ''}</div>
     `;
     card.addEventListener('click', () => onSelect(game));
     grid.appendChild(card);
